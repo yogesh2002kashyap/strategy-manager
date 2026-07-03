@@ -1,0 +1,212 @@
+{
+  "info": {
+    "_postman_id": "8f3e2c19-9c75-4bd5-a2d8-66f740ef05b0",
+    "name": "Microservice Decoupling Strategy Manager API",
+    "description": "Postman collection for validating the Strategy Manager API. Current coverage includes create, list, and get-by-id endpoints, with variables prepared for future CRUD expansion.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Strategies",
+      "description": "Strategy resource requests. Update and delete requests can be added here when those endpoints are implemented.",
+      "item": [
+        {
+          "name": "Create Strategy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"strategyName\": \"Order Service Event-Driven Migration\",\n  \"serviceName\": \"order-service\",\n  \"communicationType\": \"Event-Driven\",\n  \"description\": \"Move synchronous order notifications to an asynchronous domain event workflow.\",\n  \"owner\": \"Platform Architecture Team\",\n  \"status\": \"Planned\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/strategies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "strategies"
+              ]
+            },
+            "description": "Creates a strategy and stores the returned `_id` in the `strategyId` environment variable."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response time is under 1000ms', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test('Content-Type is application/json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "const strategy = pm.response.json();",
+                  "",
+                  "pm.test('Response includes required strategy fields', function () {",
+                  "  pm.expect(strategy).to.include.keys('_id', 'strategyName', 'serviceName', 'communicationType', 'description', 'owner', 'status', 'createdAt', 'updatedAt');",
+                  "});",
+                  "",
+                  "pm.test('Strategy ID is returned and saved', function () {",
+                  "  pm.expect(strategy._id).to.be.a('string').and.not.empty;",
+                  "  pm.environment.set('strategyId', strategy._id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Strategies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/strategies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "strategies"
+              ]
+            },
+            "description": "Retrieves all strategies."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is under 1000ms', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test('Content-Type is application/json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "const strategies = pm.response.json();",
+                  "",
+                  "pm.test('Response body is an array', function () {",
+                  "  pm.expect(strategies).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Returned strategies include required fields when present', function () {",
+                  "  strategies.forEach(function (strategy) {",
+                  "    pm.expect(strategy).to.include.keys('_id', 'strategyName', 'serviceName', 'communicationType', 'description', 'owner', 'status', 'createdAt', 'updatedAt');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Strategy By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/strategies/{{strategyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "strategies",
+                "{{strategyId}}"
+              ]
+            },
+            "description": "Retrieves the strategy identified by the `strategyId` environment variable."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.environment.get('strategyId')) {",
+                  "  throw new Error('Missing strategyId. Run Create Strategy first or set the strategyId environment variable.');",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is under 1000ms', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test('Content-Type is application/json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "",
+                  "const strategy = pm.response.json();",
+                  "",
+                  "pm.test('Response includes required strategy fields', function () {",
+                  "  pm.expect(strategy).to.include.keys('_id', 'strategyName', 'serviceName', 'communicationType', 'description', 'owner', 'status', 'createdAt', 'updatedAt');",
+                  "});",
+                  "",
+                  "pm.test('Returned strategy matches environment strategyId', function () {",
+                  "  pm.expect(strategy._id).to.eql(pm.environment.get('strategyId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "strategyId",
+      "value": ""
+    }
+  ]
+}
