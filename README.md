@@ -34,7 +34,7 @@ This project includes a React frontend and an Express/MongoDB backend for creati
 
 ### Frontend
 
-- VITE_API_URL: deployed backend URL (for example, https://tool-lending-library.onrender.com/api)
+- VITE_API_URL: deployed backend URL (for example, [https://tool-lending-library.onrender.com/api](https://tool-lending-library-72si.onrender.com))
 
 ### Backend
 
